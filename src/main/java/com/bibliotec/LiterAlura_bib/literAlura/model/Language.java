@@ -12,12 +12,28 @@ public enum Language {
     PORTUGUESE("pt", "Portugues"),
     UNKNOWN("unknow", "Desconocido");
 
-    private String lenguageGutendex;
+    private final String lenguageGutendex;
 
-    private String lenguageGutendexred;
+    private final String lenguageGutendexred;
 
     Language(String lenguageGutendex, String lenguageGutendexred) {
         this.lenguageGutendex = lenguageGutendex;
         this.lenguageGutendexred = lenguageGutendexred;
+    }
+
+    /**
+     * Método para realizar las comparaciones entre los lenguajes manejados por
+     * el api gutendex con los lengujes establecidos como constantes aquí
+     * */
+    public static Language fromConverString(String text){
+
+        for(Language language : Language.values()){
+            if(language.lenguageGutendex.equalsIgnoreCase(text)){
+                return language;
+            }
+
+        }
+        throw new IllegalArgumentException("Lenguaje no encontrado. " + text);
+
     }
 }

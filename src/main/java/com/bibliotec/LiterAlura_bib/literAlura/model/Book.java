@@ -31,8 +31,8 @@ public class Book {
      * personalizar los lenguajes que seran utilizados en la presente aplicación
      * */
     @Enumerated(EnumType.STRING)
-    private String lenguages;
-    private String dowloaf_count;
+    private Language lenguages;
+    private String downloadCount;
     //Conexión con la tabla seria de muchos a muchos
     /**
      * La conexión con la entre las entidades de la base de datos es de muchos a muchos
