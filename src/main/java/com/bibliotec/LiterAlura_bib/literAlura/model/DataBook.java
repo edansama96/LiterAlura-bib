@@ -12,10 +12,10 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record DataBook(
-        @JsonAlias("title")String title, // el nombre del campo es igual al del JSON, no se necesita @JsonAlias
-        @JsonAlias("summaries") String summaries,
-        @JsonAlias("languages") String languages,
-        @JsonAlias("download_count") String downloadCount,
-        @JsonAlias("authors") List<String> authors // puedes usar otro DTO si necesitas más detalle
+        @JsonAlias("title") String title,
+        @JsonAlias("authors") List<DataAuthor> authors,
+        @JsonAlias("languages") List<String> languages,
+        @JsonAlias("download_count") Integer downloadCount
+
 ) {
 }

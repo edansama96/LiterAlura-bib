@@ -1,7 +1,15 @@
 package com.bibliotec.LiterAlura_bib.literAlura.primal;
 
+import com.bibliotec.LiterAlura_bib.literAlura.model.DataAuthor;
+import com.bibliotec.LiterAlura_bib.literAlura.model.DataBook;
+import com.bibliotec.LiterAlura_bib.literAlura.model.DataResultBooks;
 import com.bibliotec.LiterAlura_bib.literAlura.service.ConsumoApi;
+import com.bibliotec.LiterAlura_bib.literAlura.service.ConvierteDatos;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLOutput;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -10,58 +18,127 @@ import java.util.Scanner;
  *
  * */
 public class Primal {
-    private Scanner teclado = new Scanner(System.in);
 
-    private ConsumoApi consumoApi = new ConsumoApi();
     //Variable que maneja la información constante de la URI del api
-    private final String URL_BASE = "https://gutendex.com/books?";
+    private final String URL_BASE = "https://gutendex.com/books/";
+   //Variable que maneja la instnacia de Scanner para obtener los datos por consola
+    private Scanner teclado = new Scanner(System.in);
+    //Instnacia de la clase conver datos para convertir los datos
+    private final ConvierteDatos conversor = new ConvierteDatos();
+    //Instancias para usar la clase que consume el API
+    private final ConsumoApi consumoApi = new ConsumoApi();
+
     //Método utilizado para crear el menu de la aplicación
     // en donde este funcionara por consola
     public void  showTheMenu(){
-        System.out.println("Por favor ingrese el nombre del Book");
-        var nombreAuthor = teclado.nextLine();
-//        var opcion = -1;
-//        while(opcion != 0){
-//            var menu = """
-//                1 - Buscar Series
-//                2 - Buscar Episodios
-//                3 - Mostrar Series buscadas
-//                4 - Buscar Series por título
-//                5 - Top 5 Mejores Series
-//                6 - Buscar Series por categoria
-//                7 - Filtrar series por una cantidad de temporadas y evaluación
-//                8 - Buscar episodios por nombre o título
-//                9 - Top 5 episodios por serie
-//                0-salir
-//                """;
-//            System.out.println(menu);
-//            opcion = teclado.nextInt();
-//            teclado.nextLine();
-//
-//            switch (opcion){
-//                case 1:
-//                    buscarSerieWeb();
-//                    break;
-//                case 2:
-//                    buscarEpisodioPorSerie();
-//                    break;
-//                case 3:
-//                    mostrarSeriesBuscadas();
-//                    break;
-//                case 4:
-//                    buscarSeriePorTitulo();
-//                    break;
-//                case 5 :
-//                    buscarTop5Series();
-//                    break;
-//                case 0:
-//                    System.out.println("Cerrando la aplicación...");
-//                    break;
-//                default:
-//                    System.out.println("Opción inválida");
-//                    break;
-//            }
-//        }
+        System.out.println("Si llega a este punto");
+        var opcion = -1;
+        while(opcion != 0){
+            var menu = """
+                1 - Buscar Libro por titulo
+                
+                0-salir
+                """;
+            System.out.println(menu);
+            opcion = teclado.nextInt();
+            teclado.nextLine();
+
+            switch (opcion){
+                case 1:
+                    buscarLibroPorTitulo();
+                    break;
+
+                default:
+                    System.out.println("Opción inválida");
+                    break;
+            }
+        }
+
+
+    }
+
+    private void buscarLibroPorTitulo() {
+            Scanner entrada = new Scanner(System.in);
+
+            System.out.print("Ingresa el libro que quieras buscar: ");
+            //Variable que guarda la información ingresada por el usuario
+            var nombreLibro = entrada.nextLine();
+            //variable que se usara para indivar que las palabras seran procesada al usar UTF8 y con esto se asegura
+        // que si el usaurio ingresa caracteres espaciales los modifique, además también reemplaza los espacios por +
+        // que es otra forma de poder concatenar las palabras aparte del %20 indicada por el usauri
+            var nombreLibroCodificado = URLEncoder.encode(nombreLibro, StandardCharsets.UTF_8);
+        var json = consumoApi.obtenerDatos(URL_BASE + "?search=" + nombreLibroCodificado);
+        //System.out.println("Información manejada: " +json);
+            if (json == null) {
+                System.out.println("No se pudo obtener información del API.");
+                return;
+            }
+            //se guarda la información de resultados en la instnacia
+        // de la clase data resultados, además de usar el conversor para indicar que la información json
+        // es de tipo dataresultados
+            DataResultBooks librosResultado = conversor.obtenerDatos(json, DataResultBooks.class);
+            //Se valida que la información guardada en librosResultados no sea null
+            if (librosResultado.results() == null || librosResultado.results().isEmpty()) {
+                System.out.println("No se encontraron libros con ese nombre.");
+                return;
+            }
+        System.out.println("----------------Hola");
+            //avance en la fdorma de poder obtener el primer dato de la lista result
+            var prueba =librosResultado.results().get(0);
+        System.out.println("Prueba" + prueba);
+        System.out.println("----------------Hola");
+        //Manejo de toda la lista results
+            System.out.println("Libros encontrados:\n");
+            librosResultado.results().forEach(libro -> {
+                System.out.println("----------------------------");
+                System.out.println("Título: " + libro.title());
+                System.out.println("Autores: ");
+                libro.authors().forEach(a -> {
+                    System.out.println("Nombre: " + a.name());
+                    System.out.println("Fecha de nacimiento: " + a.birthYear());
+                    System.out.println("Fecha de Muerte: " + a.deathYear());
+                });
+                System.out.println("Idiomas: " + libro.languages());
+                System.out.println("Descargas: " + libro.downloadCount());
+                System.out.println("----------------------------");
+            });
+        System.out.println("Primera version------- arriba");
+//            //Prueba del uso del Stream de otra forma
+        List<DataBook> librosConvertidos = librosResultado.results().stream()
+                .map(libro -> new DataBook(
+                        libro.title(),
+                        libro.authors(),
+                        libro.languages(),
+                        libro.downloadCount()
+                ))
+                .toList();
+        System.out.println("Lista de libros:------------------------------------");
+        System.out.println("Cambio");
+        librosConvertidos.forEach(libro-> {
+            System.out.println("Título: " + libro.title());
+            System.out.println("Idiomas: " + libro.languages());
+            System.out.println("Autor o Autores: " + libro.authors());
+            System.out.println("Descargas: " + libro.downloadCount());
+            System.out.println("----------------------------\n");
+        });
+        System.out.println("Lista de libros:------------------------------------\n");
+
+        //Se procede realizar una conversión de resultadoDatos a DataAuthor
+        List<DataAuthor> autoresUnicos = librosResultado.results().stream()
+                .flatMap(escritor -> escritor.authors().stream())
+                .distinct() // evita duplicados si los record tienen equals/hashCode implementado
+                .toList();
+
+
+
+
+        System.out.println("Lista de autores-----------------------------");
+        autoresUnicos.forEach(aut -> {
+            System.out.println("Autor: " +aut.name());
+            System.out.println("Fecha de nacimiento: " +aut.birthYear());
+            System.out.println("Fecha de muerte: " + aut.deathYear());
+        });
+        System.out.println("Lista de autores-----------------------------");
 
 
     }
