@@ -82,28 +82,36 @@ public class Primal {
                 System.out.println("No se encontraron libros con ese nombre.");
                 return;
             }
-        System.out.println("----------------Hola");
-            //avance en la fdorma de poder obtener el primer dato de la lista result
-            var prueba =librosResultado.results().get(0);
-        System.out.println("Prueba" + prueba);
-        System.out.println("----------------Hola");
-        //Manejo de toda la lista results
-            System.out.println("Libros encontrados:\n");
-            librosResultado.results().forEach(libro -> {
-                System.out.println("----------------------------");
-                System.out.println("Título: " + libro.title());
-                System.out.println("Autores: ");
-                libro.authors().forEach(a -> {
-                    System.out.println("Nombre: " + a.name());
-                    System.out.println("Fecha de nacimiento: " + a.birthYear());
-                    System.out.println("Fecha de Muerte: " + a.deathYear());
-                });
-                System.out.println("Idiomas: " + libro.languages());
-                System.out.println("Descargas: " + libro.downloadCount());
-                System.out.println("----------------------------");
-            });
-        System.out.println("Primera version------- arriba");
-//            //Prueba del uso del Stream de otra forma
+            //Se utilizopara validar la forma en la cual se obtenian el primer dato de la lista resultados del api
+//        System.out.println("----------------Hola");
+//            //avance en la forma de poder obtener el primer dato de la lista result
+//            var prueba =librosResultado.results().get(0);
+//        System.out.println("Prueba" + prueba);
+//        System.out.println("----------------Hola");
+        //Manejo de toda la lista results se procede a mostra la información importante obtenida directamente de la API
+//            System.out.println("Libros encontrados:\n");
+//            librosResultado.results().forEach(libro -> {
+//                System.out.println("----------------------------");
+//                System.out.println("Título: " + libro.title());
+//                System.out.println("Autores: ");
+//                libro.authors().forEach(a -> {
+//                    System.out.println("Nombre: " + a.name());
+//                    System.out.println("Fecha de nacimiento: " + a.birthYear());
+//                    System.out.println("Fecha de Muerte: " + a.deathYear());
+//                });
+//                System.out.println("Idiomas: " + libro.languages());
+//                System.out.println("Descargas: " + libro.downloadCount());
+//                System.out.println("----------------------------");
+//            });
+//        System.out.println("Primera version------- arriba");
+
+        /**
+         * Se realizaron conversiones debido a que se tenian una clase Record que contiene results del api manejada
+         * dicha api en esa lista results contiene toda la información de libros y autores que se desea utilizar
+         * por  eso se uso dicha clase y los parametros de autor y libros para convetirlos en las clases adecuadas de
+         * libro y autor
+         * */
+
         List<DataBook> librosConvertidos = librosResultado.results().stream()
                 .map(libro -> new DataBook(
                         libro.title(),
