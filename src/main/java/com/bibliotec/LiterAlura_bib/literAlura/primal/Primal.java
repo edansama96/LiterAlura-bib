@@ -7,7 +7,9 @@ import com.bibliotec.LiterAlura_bib.literAlura.service.ConvierteDatos;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLOutput;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -76,6 +78,7 @@ public class Primal {
         // de la clase data resultados, además de usar el conversor para indicar que la información json
         // es de tipo dataresultados
             DataResultBooks librosResultado = conversor.obtenerDatos(json, DataResultBooks.class);
+
             //Se valida que la información guardada en librosResultados no sea null
             if (librosResultado.results() == null || librosResultado.results().isEmpty()) {
                 System.out.println("No se encontraron libros con ese nombre.");
@@ -105,6 +108,23 @@ public class Primal {
 //        System.out.println("Primera version------- arriba");
 
         /**
+         * Método para realizar la busqueda de un libro por su titulo
+         * busca 1 elemento a la vez
+         * */
+        Optional<DataBook> libroCambios= librosResultado.results().stream()
+                .filter(b -> b.title().toUpperCase().contains(nombreLibro.toUpperCase()))
+                .findFirst();
+        // Ciclo if para validar si el libro esta
+        if (libroCambios.isPresent()){
+            System.out.println("Libro Encontrado");
+            System.out.println(libroCambios.get());
+            System.out.println("hhhhhhhhhhhhhhhh");
+        }else{
+            System.out.println("Libro no encontrado.");
+        }
+
+
+        /**
          * Se realizaron conversiones debido a que se tenian una clase Record que contiene results del api manejada
          * dicha api en esa lista results contiene toda la información de libros y autores que se desea utilizar
          * por  eso se uso dicha clase y los parametros de autor y libros para convetirlos en las clases adecuadas de
@@ -120,6 +140,9 @@ public class Primal {
                 ))
                 .distinct()
                 .collect(Collectors.toList());
+
+
+
 //        System.out.println("Lista de libros:------------------------------------");
 //        System.out.println("Cambio");
 //        librosConvertidos.forEach(libro-> {
@@ -188,26 +211,33 @@ public class Primal {
 
 
         //Busqueda de auotres vivos en un determinado año
-        System.out.println("Por favor indica el año para mostrar" +
-                "los autores vivos en dicho tiempo: ");
+//        System.out.println("Por favor indica el año para mostrar" +
+//                "los autores vivos en dicho tiempo: ");
         //Se obtiene la información del usuario
-        var fechaBusqueda = teclado.nextInt();
-        teclado.nextLine();
-        System.out.println("Autores vivos en el año " + fechaBusqueda +":");
+//        var fechaBusqueda = teclado.nextInt();
+//        teclado.nextLine();
+//        System.out.println("Autores vivos en el año " + fechaBusqueda +":");
 
         //Se trabaja con la lista autoresInfo para menajar las fehcas
         //peek para revisar el proceso realziado por el stream                 .peek(a -> System.out.println("Primer Filtro (N/A) y fecha igual" + a))
-        autoresInfo.stream()
-                .filter(a -> a.getBirthYear() != null && a.getBirthYear() <= fechaBusqueda)
-                .filter(a -> a.getDeathYear() == null || a.getDeathYear() > fechaBusqueda)
-                .forEach(a -> {
-                    System.out.println("-----------------------------");
-                    System.out.println("Nombre: " + a.getName() );
-                    System.out.println("Fecha de nacimiento: " + a.getBirthYear());
-                    System.out.println("Fecha de fallecimiento: " + a.getDeathYear());
-                    System.out.println("-----------------------------");
-                 });
+//        autoresInfo.stream()
+//                .filter(a -> a.getBirthYear() != null && a.getBirthYear() <= fechaBusqueda)
+//                .filter(a -> a.getDeathYear() == null || a.getDeathYear() > fechaBusqueda)
+//                .forEach(a -> {
+//                    System.out.println("-----------------------------");
+//                    System.out.println("Nombre: " + a.getName() );
+//                    System.out.println("Fecha de nacimiento: " + a.getBirthYear());
+//                    System.out.println("Fecha de fallecimiento: " + a.getDeathYear());
+//                    System.out.println("-----------------------------");
+//                 });
 
+                //Top 10 de libros más descargados
+        System.out.println("Top 10 libros más descargados");
+        librosResultado.results().stream()
+                .sorted(Comparator.comparing(DataBook::downloadCount).reversed())
+                .limit(10)
+                .map(b -> b.title().toUpperCase())
+                .forEach(System.out::println);
 
 
 
