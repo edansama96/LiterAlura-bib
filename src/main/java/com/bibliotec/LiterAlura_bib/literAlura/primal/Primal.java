@@ -1,8 +1,6 @@
 package com.bibliotec.LiterAlura_bib.literAlura.primal;
 
-import com.bibliotec.LiterAlura_bib.literAlura.model.DataAuthor;
-import com.bibliotec.LiterAlura_bib.literAlura.model.DataBook;
-import com.bibliotec.LiterAlura_bib.literAlura.model.DataResultBooks;
+import com.bibliotec.LiterAlura_bib.literAlura.model.*;
 import com.bibliotec.LiterAlura_bib.literAlura.service.ConsumoApi;
 import com.bibliotec.LiterAlura_bib.literAlura.service.ConvierteDatos;
 
@@ -11,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLOutput;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Clase principal que permitira interactuar con l usuario atravez de un menu
@@ -119,34 +118,79 @@ public class Primal {
                         libro.languages(),
                         libro.downloadCount()
                 ))
-                .toList();
-        System.out.println("Lista de libros:------------------------------------");
-        System.out.println("Cambio");
-        librosConvertidos.forEach(libro-> {
-            System.out.println("Título: " + libro.title());
-            System.out.println("Idiomas: " + libro.languages());
-            System.out.println("Autor o Autores: " + libro.authors());
-            System.out.println("Descargas: " + libro.downloadCount());
-            System.out.println("----------------------------\n");
-        });
-        System.out.println("Lista de libros:------------------------------------\n");
+                .distinct()
+                .collect(Collectors.toList());
+//        System.out.println("Lista de libros:------------------------------------");
+//        System.out.println("Cambio");
+//        librosConvertidos.forEach(libro-> {
+//            System.out.println("Título: " + libro.title());
+//            System.out.println("Idiomas: " + libro.languages());
+//            System.out.println("Autor o Autores: " + libro.authors());
+//            System.out.println("Descargas: " + libro.downloadCount());
+//            System.out.println("----------------------------\n");
+//        });
+//        System.out.println("Lista de libros:------------------------------------\n");
+
+        /**
+         * Se realiza la conversión de la infroamción o data
+         * a objetos de tipo clase Book
+         *
+         *
+         * */
+        List<Book> books = librosResultado.results().stream()
+                .map(infoBook -> new Book(
+                   infoBook.title(),
+                   infoBook.authors(),
+                   Language.fromString(
+                           infoBook.languages().isEmpty() ? null : infoBook.languages().get(0)),
+                   infoBook.downloadCount()
+                ))
+                .distinct()
+                .collect(Collectors.toList());
+
+        books.forEach(System.out::println);
+
 
         //Se procede realizar una conversión de resultadoDatos a DataAuthor
+        //EN este caso siver para la situación en donde solo se mostrara la información al usar el flatmap
         List<DataAuthor> autoresUnicos = librosResultado.results().stream()
                 .flatMap(escritor -> escritor.authors().stream())
                 .distinct() // evita duplicados si los record tienen equals/hashCode implementado
-                .toList();
+                .collect(Collectors.toList());
+
+//        System.out.println("Lista de autores-----------------------------");
+//        autoresUnicos.forEach(aut -> {
+//            System.out.println("Autor: " +aut.name());
+//            System.out.println("Fecha de nacimiento: " +aut.birthYear());
+//            System.out.println("Fecha de muerte: " + aut.deathYear());
+//        });
+//        System.out.println("Lista de autores-----------------------------");
+
+
+       //Se convierte los datos a una lista de Autores
+        /**
+         * Para poder realizar la conversión necesaria primero
+         * se cambie y accede a la información del libro que es el
+         * primer espacio de lista para así depsues ingresar al
+         * espacio de lista de autor o autores
+         * */
+
+        List<Author> autoresInfo = librosResultado.results().stream()
+                .flatMap(dataBook -> dataBook.authors().stream())
+                .distinct()
+                .map(dataAuthor -> new Author(
+                        dataAuthor.name(),
+                        dataAuthor.birthYear(),
+                        dataAuthor.deathYear()
+
+                )).collect(Collectors.toList());
+        autoresInfo.forEach(System.out::println);
 
 
 
 
-        System.out.println("Lista de autores-----------------------------");
-        autoresUnicos.forEach(aut -> {
-            System.out.println("Autor: " +aut.name());
-            System.out.println("Fecha de nacimiento: " +aut.birthYear());
-            System.out.println("Fecha de muerte: " + aut.deathYear());
-        });
-        System.out.println("Lista de autores-----------------------------");
+
+
 
 
     }
