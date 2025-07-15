@@ -187,6 +187,26 @@ public class Primal {
         autoresInfo.forEach(System.out::println);
 
 
+        //Busqueda de auotres vivos en un determinado año
+//        System.out.println("Por favor indica el año para mostrar" +
+//                "los autores vivos en dicho tiempo: ");
+        //Se obtiene la información del usuario
+//        var fechaBusqueda = teclado.nextInt();
+//        teclado.nextLine();
+
+        //Se trabaja con la lista autoresInfo para menajar las fehcas
+        //peek para revisar el proceso realziado por el stream                 .peek(a -> System.out.println("Primer Filtro (N/A) y fecha igual" + a))
+//        autoresInfo.stream()
+//                .filter(a -> a.getBirthYear() != null &&  a.getBirthYear().equals(fechaBusqueda))
+//                .forEach(a -> {
+//                    System.out.println("Autores vivos en el año " + fechaBusqueda +":");
+//                    System.out.println("Nombre: " + a.getName() );
+//                    System.out.println("Fecha de nacimiento: " + a.getBirthYear());
+//                    System.out.println("Fecha de fallecimiento: " + a.getDeathYear());
+//                 });
+
+
+
 
 
 
