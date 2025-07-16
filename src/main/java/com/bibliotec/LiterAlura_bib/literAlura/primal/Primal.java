@@ -7,10 +7,7 @@ import com.bibliotec.LiterAlura_bib.literAlura.service.ConvierteDatos;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLOutput;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -163,18 +160,18 @@ public class Primal {
          *
          *
          * */
-        List<Book> books = librosResultado.results().stream()
-                .map(infoBook -> new Book(
-                   infoBook.title(),
-                   infoBook.authors(),
-                   Language.fromString(
-                           infoBook.languages().isEmpty() ? null : infoBook.languages().get(0)),
-                   infoBook.downloadCount()
-                ))
-                .distinct()
-                .collect(Collectors.toList());
-
-        books.forEach(System.out::println);
+//        List<Book> books = librosResultado.results().stream()
+//                .map(infoBook -> new Book(
+//                   infoBook.title(),
+//                   infoBook.authors(),
+//                   Language.fromString(
+//                           infoBook.languages().isEmpty() ? null : infoBook.languages().get(0)),
+//                   infoBook.downloadCount()
+//                ))
+//                .distinct()
+//                .collect(Collectors.toList());
+//
+//        books.forEach(System.out::println);
 
 
         //Se procede realizar una conversión de resultadoDatos a DataAuthor
@@ -201,7 +198,18 @@ public class Primal {
          * espacio de lista de autor o autores
          * */
 
-        List<Author> autoresInfo = librosResultado.results().stream()
+//        List<Author> autoresInfo = librosResultado.results().stream()
+//                .flatMap(dataBook -> dataBook.authors().stream())
+//                .distinct()
+//                .map(dataAuthor -> new Author(
+//                        dataAuthor.name(),
+//                        dataAuthor.birthYear(),
+//                        dataAuthor.deathYear()
+//
+//                )).collect(Collectors.toList());
+//        autoresInfo.forEach(System.out::println);
+
+        List<Author> autoresInfo = libroCambios.stream()
                 .flatMap(dataBook -> dataBook.authors().stream())
                 .distinct()
                 .map(dataAuthor -> new Author(
@@ -243,6 +251,14 @@ public class Primal {
 //                .forEach(System.out::println);
 //
 
+        //Trabajando con estadisticas
+        DoubleSummaryStatistics est = librosResultado.results().stream()
+                .filter(d -> d.downloadCount() > 0)
+                .collect(Collectors.summarizingDouble(DataBook::downloadCount));
+        System.out.println("Cantidad media de descargas: " + est.getAverage());
+        System.out.println("Cantidad máxima de descargas: " + est.getMax());
+        System.out.println("Cantidad mínima de descargas: " + est.getMin());
+        System.out.println("Cantidad de registros evaluados para calcular las estadisticas:  " + est.getCount());
 
 
 
