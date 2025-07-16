@@ -16,7 +16,10 @@ public enum Language {
     DE("de", "Aelmán"),
     FR("fr", "Francés"),
     IT("it", "Italiano"),
-    PT("pt", "Portugués");
+    PT("pt", "Portugués"),
+    HU("hu", "Húngaro"),
+    FI("fi", "Finlandés"),
+    CA("ca", "Catalán");
 
     /**
      * Se manejan variables

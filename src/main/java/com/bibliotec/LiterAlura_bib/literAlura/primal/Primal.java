@@ -132,6 +132,9 @@ public class Primal {
          * */
 
         List<DataBook> librosConvertidos = librosResultado.results().stream()
+                .filter(b -> b.title().toUpperCase().contains(nombreLibro.toUpperCase()))
+                .filter(libro -> !libro.languages().isEmpty() &&
+                        (libro.languages().get(0).equals("es") || libro.languages().get(0).equals("en")))
                 .map(libro -> new DataBook(
                         libro.title(),
                         libro.authors(),
@@ -232,13 +235,13 @@ public class Primal {
 //                 });
 
                 //Top 10 de libros más descargados
-        System.out.println("Top 10 libros más descargados");
-        librosResultado.results().stream()
-                .sorted(Comparator.comparing(DataBook::downloadCount).reversed())
-                .limit(10)
-                .map(b -> b.title().toUpperCase())
-                .forEach(System.out::println);
-
+//        System.out.println("Top 10 libros más descargados");
+//        librosResultado.results().stream()
+//                .sorted(Comparator.comparing(DataBook::downloadCount).reversed())
+//                .limit(10)
+//                .map(b -> b.title().toUpperCase())
+//                .forEach(System.out::println);
+//
 
 
 
