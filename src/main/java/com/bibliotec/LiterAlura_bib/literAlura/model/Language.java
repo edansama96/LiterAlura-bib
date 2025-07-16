@@ -17,9 +17,10 @@ public enum Language {
     FR("fr", "Francés"),
     IT("it", "Italiano"),
     PT("pt", "Portugués"),
-    HU("hu", "Húngaro"),
-    FI("fi", "Finlandés"),
-    CA("ca", "Catalán");
+    UNKNOWN("unknown", "Desconocido");
+//    HU("hu", "Húngaro"),
+//    FI("fi", "Finlandés"),
+//    CA("ca", "Catalán");
 
     /**
      * Se manejan variables
@@ -50,7 +51,9 @@ public enum Language {
                 return language;
             }
         }
-        throw new IllegalArgumentException("Lenguaje no encontrado: " + text);
+        //throw new IllegalArgumentException("Lenguaje no encontrado: " + text);
+        System.out.println("Idioma no reconocido: " + text);
+        return UNKNOWN;
     }
 
 

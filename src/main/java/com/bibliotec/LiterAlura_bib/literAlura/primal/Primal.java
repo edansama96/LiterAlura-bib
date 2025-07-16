@@ -131,18 +131,18 @@ public class Primal {
          * libro y autor
          * */
 
-        List<DataBook> librosConvertidos = librosResultado.results().stream()
-                .filter(b -> b.title().toUpperCase().contains(nombreLibro.toUpperCase()))
-                .filter(libro -> !libro.languages().isEmpty() &&
-                        (libro.languages().get(0).equals("es") || libro.languages().get(0).equals("en")))
-                .map(libro -> new DataBook(
-                        libro.title(),
-                        libro.authors(),
-                        libro.languages(),
-                        libro.downloadCount()
-                ))
-                .distinct()
-                .collect(Collectors.toList());
+//        List<DataBook> librosConvertidos = librosResultado.results().stream()
+//                .filter(b -> b.title().toUpperCase().contains(nombreLibro.toUpperCase()))
+//                .filter(b -> !b.languages().isEmpty() &&
+//                        (b.languages().get(0).equals("es") || b.languages().get(0).equals("en")))
+//                .map(libro -> new DataBook(
+//                        libro.title(),
+//                        libro.authors(),
+//                        libro.languages(),
+//                        libro.downloadCount()
+//                ))
+//                .distinct()
+//                .collect(Collectors.toList());
 
 
 
