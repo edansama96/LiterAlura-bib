@@ -25,7 +25,11 @@ public class Primal {
     //Instancias para usar la clase que consume el API
     private final ConsumoApi consumoApi = new ConsumoApi();
     //Variable para guardar la lista de los libros buscados por el autor
-    private List <Book> datosBook = new ArrayList<>();
+    private List <Book> datosBooks = new ArrayList<>();
+    //Variable de tipo lista para guardar a los autores registrados
+    private List <Author> authorsRegistry = new ArrayList<>();
+    //Guardar la información solicitada por el usuario
+    DataResultBooks infoBook;
 
     //Método utilizado para crear el menu de la aplicación
     // en donde este funcionara por consola
@@ -36,6 +40,7 @@ public class Primal {
             var menu = """
                 1 - Buscar Libro por titulo
                 2 - Listar libros registrados
+                3 - Listar autores registrados
                 
                 0-salir
                 """;
@@ -50,6 +55,9 @@ public class Primal {
                 case 2:
                     listarLibrosRegistrados();
                     break;
+                case 3:
+                    listarAuoresRegistrados();
+                    break;
 
                 default:
                     System.out.println("Opción inválida");
@@ -59,7 +67,6 @@ public class Primal {
 
 
     }
-
 
 
 
@@ -98,7 +105,7 @@ public class Primal {
         //Variable que guarda la información ingresada por el usuario
         var infousuario = teclado.nextLine();
         //Se intancia y llama al método obtener libros
-        DataResultBooks infoBook = getDatosBook(infousuario);
+         infoBook = getDatosBook(infousuario);
 
         /**
          * Método para realizar la busqueda de un libro por su titulo
@@ -122,7 +129,7 @@ public class Primal {
         if (libroCambios.isPresent()) {
             System.out.println("Libro Encontrado");
             System.out.println(libroCambios.get());
-            datosBook.add(libroCambios.get());
+            datosBooks.add(libroCambios.get());
 
         } else {
             System.out.println("Libro no encontrado: " + infousuario);
@@ -134,9 +141,25 @@ public class Primal {
     }
 
     private void listarLibrosRegistrados() {
-        datosBook.forEach(System.out::println);
+        datosBooks.forEach(System.out::println);
 
     }
+
+    private void listarAuoresRegistrados() {
+     List<Author> converDatosAuthor  = datosBooks.stream().flatMap(book -> book.getAuthors().stream())
+             .map(infoAuthor -> new Author(
+                     infoAuthor.name(),
+                     infoAuthor.birthYear(),
+                     infoAuthor.deathYear()
+             )).distinct()
+             .collect(Collectors.toList());
+
+      authorsRegistry.addAll(converDatosAuthor);
+
+      authorsRegistry.forEach(System.out::println);
+
+    }
+
 
 
 

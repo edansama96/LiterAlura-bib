@@ -1,6 +1,5 @@
 package com.bibliotec.LiterAlura_bib.literAlura.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 
 import java.util.List;
 
