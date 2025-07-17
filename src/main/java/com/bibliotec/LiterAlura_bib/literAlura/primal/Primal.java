@@ -6,7 +6,6 @@ import com.bibliotec.LiterAlura_bib.literAlura.service.ConvierteDatos;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,8 @@ public class Primal {
     private final ConvierteDatos conversor = new ConvierteDatos();
     //Instancias para usar la clase que consume el API
     private final ConsumoApi consumoApi = new ConsumoApi();
+    //Variable para guardar la lista de los libros buscados por el autor
+    private List <Book> datosBook = new ArrayList<>();
 
     //Método utilizado para crear el menu de la aplicación
     // en donde este funcionara por consola
@@ -34,6 +35,7 @@ public class Primal {
         while(opcion != 0){
             var menu = """
                 1 - Buscar Libro por titulo
+                2 - Listar libros registrados
                 
                 0-salir
                 """;
@@ -45,6 +47,9 @@ public class Primal {
                 case 1:
                     buscarLibroPorTitulo();
                     break;
+                case 2:
+                    listarLibrosRegistrados();
+                    break;
 
                 default:
                     System.out.println("Opción inválida");
@@ -55,21 +60,20 @@ public class Primal {
 
     }
 
-    private void buscarLibroPorTitulo() {
-            Scanner entrada = new Scanner(System.in);
 
-            System.out.print("Ingresa el libro que quieras buscar: ");
-            //Variable que guarda la información ingresada por el usuario
-            var nombreLibro = entrada.nextLine();
+
+
+    private DataResultBooks getDatosBook(String nombreLibro) {
+
             //variable que se usara para indivar que las palabras seran procesada al usar UTF8 y con esto se asegura
         // que si el usaurio ingresa caracteres espaciales los modifique, además también reemplaza los espacios por +
         // que es otra forma de poder concatenar las palabras aparte del %20 indicada por el usauri
             var nombreLibroCodificado = URLEncoder.encode(nombreLibro, StandardCharsets.UTF_8);
         var json = consumoApi.obtenerDatos(URL_BASE + "?search=" + nombreLibroCodificado);
-        //System.out.println("Información manejada: " +json);
+        System.out.println("Información manejada: " +json);
             if (json == null) {
                 System.out.println("No se pudo obtener información del API.");
-                return;
+                return null;
             }
             //se guarda la información de resultados en la instnacia
         // de la clase data resultados, además de usar el conversor para indicar que la información json
@@ -79,192 +83,64 @@ public class Primal {
             //Se valida que la información guardada en librosResultados no sea null
             if (librosResultado.results() == null || librosResultado.results().isEmpty()) {
                 System.out.println("No se encontraron libros con ese nombre.");
-                return;
+                return null;
             }
-            //Se utilizopara validar la forma en la cual se obtenian el primer dato de la lista resultados del api
-//        System.out.println("----------------Hola");
-//            //avance en la forma de poder obtener el primer dato de la lista result
-//            var prueba =librosResultado.results().get(0);
-//        System.out.println("Prueba" + prueba);
-//        System.out.println("----------------Hola");
-        //Manejo de toda la lista results se procede a mostra la información importante obtenida directamente de la API
-//            System.out.println("Libros encontrados:\n");
-//            librosResultado.results().forEach(libro -> {
-//                System.out.println("----------------------------");
-//                System.out.println("Título: " + libro.title());
-//                System.out.println("Autores: ");
-//                libro.authors().forEach(a -> {
-//                    System.out.println("Nombre: " + a.name());
-//                    System.out.println("Fecha de nacimiento: " + a.birthYear());
-//                    System.out.println("Fecha de Muerte: " + a.deathYear());
-//                });
-//                System.out.println("Idiomas: " + libro.languages());
-//                System.out.println("Descargas: " + libro.downloadCount());
-//                System.out.println("----------------------------");
-//            });
-//        System.out.println("Primera version------- arriba");
+
+
+
+            return librosResultado;
+
+    }
+
+    private void buscarLibroPorTitulo( ) {
+
+        System.out.print("Ingresa el libro que quieras buscar: ");
+        //Variable que guarda la información ingresada por el usuario
+        var infousuario = teclado.nextLine();
+        //Se intancia y llama al método obtener libros
+        DataResultBooks infoBook = getDatosBook(infousuario);
 
         /**
          * Método para realizar la busqueda de un libro por su titulo
          * busca 1 elemento a la vez
+         * Se usa la lista de libros obtenidos con la función getDatosBook
+         * además de usar el stream para filtrar la información como
+         * también convertir esta con map en nuevos datos de tipo Book
          * */
-        Optional<DataBook> libroCambios= librosResultado.results().stream()
-                .filter(b -> b.title().toUpperCase().contains(nombreLibro.toUpperCase()))
-                .findFirst();
+        Optional<Book> libroCambios = infoBook.results().stream()
+                .filter(b -> b.title().toUpperCase().contains(infousuario.toUpperCase()))
+                .findFirst()
+                .map(dataBook -> new Book(
+                        dataBook.title(),
+                        dataBook.authors(),
+                        Language.fromString(
+                                dataBook.languages().isEmpty() ? null : dataBook.languages().get(0)
+                        ),
+                        dataBook.downloadCount()
+                ));
         // Ciclo if para validar si el libro esta
-        if (libroCambios.isPresent()){
+        if (libroCambios.isPresent()) {
             System.out.println("Libro Encontrado");
             System.out.println(libroCambios.get());
-            System.out.println("hhhhhhhhhhhhhhhh");
-        }else{
-            System.out.println("Libro no encontrado.");
+            datosBook.add(libroCambios.get());
+
+        } else {
+            System.out.println("Libro no encontrado: " + infousuario);
         }
-
-
-        /**
-         * Se realizaron conversiones debido a que se tenian una clase Record que contiene results del api manejada
-         * dicha api en esa lista results contiene toda la información de libros y autores que se desea utilizar
-         * por  eso se uso dicha clase y los parametros de autor y libros para convetirlos en las clases adecuadas de
-         * libro y autor
-         * */
-
-//        List<DataBook> librosConvertidos = librosResultado.results().stream()
-//                .filter(b -> b.title().toUpperCase().contains(nombreLibro.toUpperCase()))
-//                .filter(b -> !b.languages().isEmpty() &&
-//                        (b.languages().get(0).equals("es") || b.languages().get(0).equals("en")))
-//                .map(libro -> new DataBook(
-//                        libro.title(),
-//                        libro.authors(),
-//                        libro.languages(),
-//                        libro.downloadCount()
-//                ))
-//                .distinct()
-//                .collect(Collectors.toList());
-
-
-
-//        System.out.println("Lista de libros:------------------------------------");
-//        System.out.println("Cambio");
-//        librosConvertidos.forEach(libro-> {
-//            System.out.println("Título: " + libro.title());
-//            System.out.println("Idiomas: " + libro.languages());
-//            System.out.println("Autor o Autores: " + libro.authors());
-//            System.out.println("Descargas: " + libro.downloadCount());
-//            System.out.println("----------------------------\n");
-//        });
-//        System.out.println("Lista de libros:------------------------------------\n");
-
-        /**
-         * Se realiza la conversión de la infroamción o data
-         * a objetos de tipo clase Book
-         *
-         *
-         * */
-//        List<Book> books = librosResultado.results().stream()
-//                .map(infoBook -> new Book(
-//                   infoBook.title(),
-//                   infoBook.authors(),
-//                   Language.fromString(
-//                           infoBook.languages().isEmpty() ? null : infoBook.languages().get(0)),
-//                   infoBook.downloadCount()
-//                ))
-//                .distinct()
-//                .collect(Collectors.toList());
-//
-//        books.forEach(System.out::println);
-
-
-        //Se procede realizar una conversión de resultadoDatos a DataAuthor
-        //EN este caso siver para la situación en donde solo se mostrara la información al usar el flatmap
-        List<DataAuthor> autoresUnicos = librosResultado.results().stream()
-                .flatMap(escritor -> escritor.authors().stream())
-                .distinct() // evita duplicados si los record tienen equals/hashCode implementado
-                .collect(Collectors.toList());
-
-//        System.out.println("Lista de autores-----------------------------");
-//        autoresUnicos.forEach(aut -> {
-//            System.out.println("Autor: " +aut.name());
-//            System.out.println("Fecha de nacimiento: " +aut.birthYear());
-//            System.out.println("Fecha de muerte: " + aut.deathYear());
-//        });
-//        System.out.println("Lista de autores-----------------------------");
-
-
-       //Se convierte los datos a una lista de Autores
-        /**
-         * Para poder realizar la conversión necesaria primero
-         * se cambie y accede a la información del libro que es el
-         * primer espacio de lista para así depsues ingresar al
-         * espacio de lista de autor o autores
-         * */
-
-//        List<Author> autoresInfo = librosResultado.results().stream()
-//                .flatMap(dataBook -> dataBook.authors().stream())
-//                .distinct()
-//                .map(dataAuthor -> new Author(
-//                        dataAuthor.name(),
-//                        dataAuthor.birthYear(),
-//                        dataAuthor.deathYear()
-//
-//                )).collect(Collectors.toList());
-//        autoresInfo.forEach(System.out::println);
-
-        List<Author> autoresInfo = libroCambios.stream()
-                .flatMap(dataBook -> dataBook.authors().stream())
-                .distinct()
-                .map(dataAuthor -> new Author(
-                        dataAuthor.name(),
-                        dataAuthor.birthYear(),
-                        dataAuthor.deathYear()
-
-                )).collect(Collectors.toList());
-        autoresInfo.forEach(System.out::println);
-
-
-        //Busqueda de auotres vivos en un determinado año
-//        System.out.println("Por favor indica el año para mostrar" +
-//                "los autores vivos en dicho tiempo: ");
-        //Se obtiene la información del usuario
-//        var fechaBusqueda = teclado.nextInt();
-//        teclado.nextLine();
-//        System.out.println("Autores vivos en el año " + fechaBusqueda +":");
-
-        //Se trabaja con la lista autoresInfo para menajar las fehcas
-        //peek para revisar el proceso realziado por el stream                 .peek(a -> System.out.println("Primer Filtro (N/A) y fecha igual" + a))
-//        autoresInfo.stream()
-//                .filter(a -> a.getBirthYear() != null && a.getBirthYear() <= fechaBusqueda)
-//                .filter(a -> a.getDeathYear() == null || a.getDeathYear() > fechaBusqueda)
-//                .forEach(a -> {
-//                    System.out.println("-----------------------------");
-//                    System.out.println("Nombre: " + a.getName() );
-//                    System.out.println("Fecha de nacimiento: " + a.getBirthYear());
-//                    System.out.println("Fecha de fallecimiento: " + a.getDeathYear());
-//                    System.out.println("-----------------------------");
-//                 });
-
-                //Top 10 de libros más descargados
-//        System.out.println("Top 10 libros más descargados");
-//        librosResultado.results().stream()
-//                .sorted(Comparator.comparing(DataBook::downloadCount).reversed())
-//                .limit(10)
-//                .map(b -> b.title().toUpperCase())
-//                .forEach(System.out::println);
-//
-
-        //Trabajando con estadisticas
-        DoubleSummaryStatistics est = librosResultado.results().stream()
-                .filter(d -> d.downloadCount() > 0)
-                .collect(Collectors.summarizingDouble(DataBook::downloadCount));
-        System.out.println("Cantidad media de descargas: " + est.getAverage());
-        System.out.println("Cantidad máxima de descargas: " + est.getMax());
-        System.out.println("Cantidad mínima de descargas: " + est.getMin());
-        System.out.println("Cantidad de registros evaluados para calcular las estadisticas:  " + est.getCount());
-
-
 
 
 
 
     }
+
+    private void listarLibrosRegistrados() {
+        datosBook.forEach(System.out::println);
+
+    }
+
+
+
+
+
 
 }

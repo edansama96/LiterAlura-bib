@@ -11,8 +11,7 @@ public class Book {
     private Language languages;
     private Integer downloadCount;
 
-//    public Book(String title, List<DataAuthor> authors, List<String> languages, Integer integer) {
-//    }
+
 
     public Book(String title, List<DataAuthor> authors, Language languages, Integer downloadCount) {
         this.title = title;
@@ -59,8 +58,6 @@ public class Book {
                 "title='" + title + '\'' +
                 ", authors=" + authors +
                 ", languages=" + languages +
-                ", downloadCount=" + downloadCount+
-                "Hola"
-                ;
+                ", downloadCount=" + downloadCount;
     }
 }
