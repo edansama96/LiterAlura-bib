@@ -1,6 +1,8 @@
 package com.bibliotec.LiterAlura_bib.literAlura.primal;
 
 import com.bibliotec.LiterAlura_bib.literAlura.model.*;
+import com.bibliotec.LiterAlura_bib.literAlura.repository.AuthorRepository;
+import com.bibliotec.LiterAlura_bib.literAlura.repository.BookRepository;
 import com.bibliotec.LiterAlura_bib.literAlura.service.ConsumoApi;
 import com.bibliotec.LiterAlura_bib.literAlura.service.ConvierteDatos;
 
@@ -29,7 +31,17 @@ public class Primal {
     //Variable de tipo lista para guardar a los autores registrados
     private List <Author> authorsRegistry = new ArrayList<>();
     //Guardar la información solicitada por el usuario
-    DataResultBooks infoBook;
+    private DataResultBooks infoBook;
+    //Variable para manejar la información de los procesos de inyección
+    private BookRepository repositorioB;
+    private AuthorRepository repositorioA;
+
+//Constructor para indicar como se inicializaran las variables para el
+    // proceso de inyección de dependencias
+    public Primal(AuthorRepository repositoryA, BookRepository repositoryB) {
+        this.repositorioB = repositoryB;
+        this.repositorioA = repositoryA;
+    }
 
     //Método utilizado para crear el menu de la aplicación
     // en donde este funcionara por consola
@@ -56,7 +68,7 @@ public class Primal {
                     listarLibrosRegistrados();
                     break;
                 case 3:
-                    listarAuoresRegistrados();
+                    listarAutoresRegistrados();
                     break;
 
                 default:
@@ -104,8 +116,10 @@ public class Primal {
         System.out.print("Ingresa el libro que quieras buscar: ");
         //Variable que guarda la información ingresada por el usuario
         var infousuario = teclado.nextLine();
-        //Se intancia y llama al método obtener libros
+        //Se instancia y llama al método obtener libros
          infoBook = getDatosBook(infousuario);
+         //Se crea una instancia para poder manejar el proceso de guardado
+        Book libroAguardar;
 
         /**
          * Método para realizar la busqueda de un libro por su titulo
@@ -119,7 +133,9 @@ public class Primal {
                 .findFirst()
                 .map(dataBook -> new Book(
                         dataBook.title(),
-                        dataBook.authors(),
+                        dataBook.authors().stream()
+                                .map(a -> new Author(a.name(), a.birthYear(), a.deathYear()))
+                                .collect(Collectors.toList()),
                         Language.fromString(
                                 dataBook.languages().isEmpty() ? null : dataBook.languages().get(0)
                         ),
@@ -129,7 +145,10 @@ public class Primal {
         if (libroCambios.isPresent()) {
             System.out.println("Libro Encontrado");
             System.out.println(libroCambios.get());
-            datosBooks.add(libroCambios.get());
+            libroAguardar = libroCambios.get();
+            repositorioB.save(libroAguardar);
+            //Guardar el libro en una lisa
+            //datosBooks.add(libroAguardar);
 
         } else {
             System.out.println("Libro no encontrado: " + infousuario);
@@ -141,22 +160,31 @@ public class Primal {
     }
 
     private void listarLibrosRegistrados() {
+        // primera forma para mostrar los datos guardados en una listadatosBooks.forEach(System.out::println);
+        datosBooks = repositorioB.findAll();
+        // para mostrar la información
         datosBooks.forEach(System.out::println);
-
     }
 
-    private void listarAuoresRegistrados() {
-     List<Author> converDatosAuthor  = datosBooks.stream().flatMap(book -> book.getAuthors().stream())
-             .map(infoAuthor -> new Author(
-                     infoAuthor.name(),
-                     infoAuthor.birthYear(),
-                     infoAuthor.deathYear()
-             )).distinct()
-             .collect(Collectors.toList());
+    private void listarAutoresRegistrados() {
+        //Pipeline para poder cambiar la información de tipo libro a author filtrado
+        //Solo la ifnormación del autor
+//     List<Author> converDatosAuthor  = datosBooks.stream().flatMap(book -> book.getAuthors().stream())
+//             .map(infoAuthor -> new Author(
+//                     infoAuthor.getName(),
+//                     infoAuthor.getBirthYear(),
+//                     infoAuthor.getDeathYear()
+//             ))
+//             .collect(Collectors.toList());
+//
+//      authorsRegistry.addAll(converDatosAuthor);
+//
+//      authorsRegistry.forEach(System.out::println);
 
-      authorsRegistry.addAll(converDatosAuthor);
+        authorsRegistry = repositorioA.findAll();
+        authorsRegistry.forEach(System.out::println);
 
-      authorsRegistry.forEach(System.out::println);
+
 
     }
 

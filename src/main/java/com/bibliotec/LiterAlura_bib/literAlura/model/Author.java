@@ -1,21 +1,36 @@
 package com.bibliotec.LiterAlura_bib.literAlura.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-
+import jakarta.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name = "authors")
 public class Author {
-     private String name;
-   private  Integer birthYear;
-    private  Integer deathYear;
 
-    public Author(List<DataAuthor> authors) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // ✅ ID único generado automáticamente
+
+    //Anotación para que cada serie sea unica y no se repita
+    @Column(unique = true)
+    private String name;
+    private Integer birthYear;
+    private Integer deathYear;
+
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
+    private List<Book> books;
+    //Constructor exigido pOR JPA
+    public Author() {
     }
 
     public Author(String name, Integer birthYear, Integer deathYear) {
         this.name = name;
         this.birthYear = birthYear;
         this.deathYear = deathYear;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
@@ -42,13 +57,20 @@ public class Author {
         this.deathYear = deathYear;
     }
 
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
     @Override
     public String toString() {
-        return
-
+        return "Author{" +
                 "name='" + name + '\'' +
                 ", birthYear=" + birthYear +
-                ", deathYear=" + deathYear
-                ;
+                ", deathYear=" + deathYear +
+                '}';
     }
 }
