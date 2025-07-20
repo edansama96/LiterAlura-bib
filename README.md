@@ -75,4 +75,4 @@ src/
 
 ---
 
-¡Explora, aprende y
+¡Explora, aprende y contribuye a **LiterAlura**!
