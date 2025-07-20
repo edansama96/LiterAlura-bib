@@ -13,7 +13,7 @@ public enum Language {
      * */
     EN("en","Inglés" ),
     ES("es", "Español"),
-    DE("de", "Aelmán"),
+    DE("de", "Alemán"),
     FR("fr", "Francés"),
     IT("it", "Italiano"),
     PT("pt", "Portugués"),
@@ -55,6 +55,19 @@ public enum Language {
         System.out.println("Idioma no reconocido: " + text);
         return UNKNOWN;
     }
+
+
+    public static  Language fromEspanol(String text){
+        for(Language language : Language.values()){
+            if(language.nombreEspanol.equalsIgnoreCase(text)){
+                return language;
+            }
+        }
+        //throw new IllegalArgumentException("Lenguaje no encontrado: " + text);
+        System.out.println("Idioma no reconocido: " + text);
+        return UNKNOWN;
+    }
+
 
 
 }

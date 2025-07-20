@@ -54,6 +54,8 @@ public class Primal {
                 1 - Buscar Libro por titulo
                 2 - Listar libros registrados
                 3 - Listar autores registrados
+                4 - Listar autores vivos en un año determinado
+                5 - Listar libros por idioma
                 
                 0-salir
                 """;
@@ -74,6 +76,10 @@ public class Primal {
                 case 4:
                     listarAutoresVivosEnUnAlloPuntual();
                     break;
+                    case 5:
+                        listarLibrosPorIdioma();
+                        break;
+
                 case 0:
                     System.out.println("Cerrando aplicación");
                     break;
@@ -215,6 +221,31 @@ public class Primal {
         }else{
             System.out.println("No se encontraron autores vivos en ese año.");
 
+        }
+    }
+
+    private void listarLibrosPorIdioma() {
+        System.out.println("""
+                Por favor seleccione alguno de los siguientes idiomas
+                 Inglés,Español , Alemán , Francés, Italiano y Portugués :
+                """);
+        var idiomaUsuiaro = teclado.nextLine();
+
+        //Conversión de string a language
+        var language = Language.fromEspanol(idiomaUsuiaro);
+
+        if (language == Language.UNKNOWN) {
+            System.out.println("Idioma no válido. Intente nuevamente.");
+            return;
+        }
+
+        List<Book> librosPorIdioma = repositorioB.findByLanguages(language);
+
+        if (librosPorIdioma.isEmpty()) {
+            System.out.println("No se encontraron libros en ese idioma.");
+        } else {
+            System.out.println("Los libros encontrados en el idioma " + idiomaUsuiaro + " son:");
+            librosPorIdioma.forEach(System.out::println);
         }
     }
 
