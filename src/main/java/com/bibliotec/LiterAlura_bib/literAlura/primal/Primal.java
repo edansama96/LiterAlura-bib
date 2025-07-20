@@ -5,6 +5,7 @@ import com.bibliotec.LiterAlura_bib.literAlura.repository.AuthorRepository;
 import com.bibliotec.LiterAlura_bib.literAlura.repository.BookRepository;
 import com.bibliotec.LiterAlura_bib.literAlura.service.ConsumoApi;
 import com.bibliotec.LiterAlura_bib.literAlura.service.ConvierteDatos;
+import jdk.swing.interop.SwingInterOpUtils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -69,6 +70,12 @@ public class Primal {
                     break;
                 case 3:
                     listarAutoresRegistrados();
+                    break;
+                case 4:
+                    listarAutoresVivosEnUnAlloPuntual();
+                    break;
+                case 0:
+                    System.out.println("Cerrando aplicación");
                     break;
 
                 default:
@@ -186,6 +193,29 @@ public class Primal {
 
 
 
+    }
+
+    private void listarAutoresVivosEnUnAlloPuntual() {
+        System.out.println("""
+                Ingrese un año para mostrar los
+                autores vivos en dicho año
+                """);
+        var usuarioAuthor = teclado.nextInt();
+        teclado.nextLine();
+        //Lista para manejar los autores vivos en un determinado año
+        List<Author> authorBuscar = repositorioA.findAutoresVivosEnAnio(usuarioAuthor);
+
+        if(!authorBuscar.isEmpty()){
+            System.out.println("Los autores vivos en el año: " + usuarioAuthor +" son:");
+//            authorBuscar.forEach(System.out::println);
+            for (Author autor : authorBuscar) {
+                System.out.println(autor.getName()); // o el campo que uses
+            }
+
+        }else{
+            System.out.println("No se encontraron autores vivos en ese año.");
+
+        }
     }
 
 
